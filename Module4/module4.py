@@ -8,6 +8,7 @@ df = pd.read_csv('https://raw.githubusercontent.com/adavidowitz100/DATA608Visual
 #df = pd.read_csv('2015_Street_Tree_Census_-_Tree_Data_subset.csv')
 
 app = Dash(external_stylesheets=[dbc.themes.MINTY])
+server = app.server
 
 load_figure_template('MINTY')
 
