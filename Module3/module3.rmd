@@ -1,0 +1,103 @@
+
+```{r}
+library(shiny)
+library(readr)
+library(plotly)
+library(dplyr)
+```
+
+```{r}
+df <- readr::read_csv("cleaned-cdc-mortality-1999-2010-2.csv", col_types = "ffiiid")
+df_choices <- df$ICD.Chapter
+states <- df$State
+```
+
+
+```{r}
+ui <- fluidPage(
+
+  # App title ----
+  titlePanel("Mortality Rate"),
+
+  # Sidebar layout with input and output definitions ----
+  sidebarLayout(
+
+    # Sidebar panel for inputs ----
+    sidebarPanel(
+
+      # Input: selection box for cause of death ----
+      selectInput(
+        inputId = "cause",
+        label = "Causes",
+        choices = df_choices,
+        selected = NULL,
+        multiple = FALSE
+      ),
+      selectInput(
+        inputId = "state",
+        label = "State",
+        choices = states,
+        selected = NULL,
+        multiple = FALSE
+      )
+
+    ),
+
+    # Main panel for displaying outputs ----
+    mainPanel(
+
+      # Output:
+      plotlyOutput(outputId = "causePlot"),
+      plotlyOutput(outputId = "ratechangePlot")
+
+    )
+  )
+)
+```
+
+
+
+```{r}
+server <- function(input, output) {
+  
+
+  output$causePlot <- renderPlotly({
+    
+      filter_df <- df |> dplyr::filter(ICD.Chapter == input$cause & Year ==2010) |>
+        arrange(desc(Crude.Rate))
+      
+      fig <- plot_ly(filter_df, y= ~Crude.Rate, x= ~State, type = 'bar',marker = list(color = 'rgb(158,202,225)',
+                            line = list(color = 'rgb(8,48,107)',
+                                        width = 1.5)))
+      
+      fig <- fig %>% layout(
+        title = paste("2010 Mortality Rate -",input$cause),
+        yaxis = list(title = "Crude Rate"),
+        xaxis = list(title = "State", categoryorder = "total descending", tickangle = 270)
+      )
+
+    })
+    
+  output$ratechangePlot <- renderPlotly({
+
+      filter2_df <- df |> dplyr::filter(ICD.Chapter == input$cause & State == input$state)
+
+      fig <- plot_ly(filter2_df, y= ~RateChange, x= ~Year, type = 'scatter', mode = "lines", name = input$state)
+      fig <- fig %>% add_trace(x = ~Year, y = ~NationalRateChange, type = "scatter", mode = "lines", name = 'National')
+      
+      fig <- fig %>% layout(
+        title = paste(input$state,"Annual Change in Mortality Rate for",input$cause, "vs Nation Average"),
+        yaxis = list(title = "Percent Change"),
+        xaxis = list(title = "Year")
+      )
+
+    })
+
+}
+
+```
+
+```{r}
+shinyApp(ui = ui, server = server)
+```
+
