@@ -1,0 +1,77 @@
+<html>
+
+<!--
+
+Create a function to reverse any word that you type in. This can be typed into either an input
+box or an alert box, and then print the result in a box or on the webpage.
+Create a function that takes an input number, and prints a table with the first 20 multiples of
+the number, in order 5x4
+
+-->
+
+<head><title>Data 608 Module 5</title></head>
+
+<body>
+    <h1>Data 608 Module 5</h1>
+    
+    <script type="text/javascript">
+        function reverseString(str) {
+            
+            var splitString = str.split("");
+            var reverseArray = splitString.reverse();
+            var joinArray = reverseArray.join("");
+            return joinArray;
+        };
+        function letSee(){
+            var t = document.getElementById("target");
+            t.innerHTML = reverseString(document.getElementById('str').value);
+        };
+        function multiplesTable(n, m) {
+            var factor = document.getElementById('num').value
+            var t = document.getElementById("target2");
+            // Create a table element
+            var table = document.createElement("table");
+
+            // Create rows and cells based on multiples
+            for (var i = 0; i < n; i++) {
+                var row = document.createElement("tr");
+
+                for (var j = 0; j < m; j++) {
+                    var cell = document.createElement("td");
+                    cell.textContent = factor * (i + 1) * (j + 1);
+                    row.appendChild(cell);
+                }
+
+                table.appendChild(row);
+            }
+            // Add the table to the target
+            t.innerHTML = "";
+            t.appendChild(table);
+        }
+    </script>
+
+    <h4>Enter a word to reverse</h4>
+    <p>
+        <form>
+            <input id="str" type="text" size="10">
+            <input type="button" value="Reverse" onClick="letSee();">
+        </form>
+    </p>
+    <div id="target"></div>
+    
+    <h4>Enter a number for first 20 multiples</h4>
+    <p>
+        <form>
+            <input id="num" type="number" size="10">
+            <input type="button" value="Multiply" onClick="multiplesTable(5, 4);">
+        </form>
+    </p>
+    <div>
+    <table id="target2">
+
+    </table>
+    </div>
+    
+
+</body>
+</html>
