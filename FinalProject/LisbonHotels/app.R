@@ -39,46 +39,64 @@ df %<>%  mutate(Corporate = ifelse(DistributionChannel == "Corporate", TRUE, FAL
 df %<>% dplyr::rename(DailyRate = ADR)
 
 
-# Define UI for application that draws a histogram
-ui <- fluidPage(
-    
-    theme = shinytheme("flatly"),
-
-    # Application title
-    titlePanel("Traveler Hotel Data in Lisbon Portugal"),
-
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput(inputId  = "weeks",
-                        label  = "Week:",
-                        min = 1,
-                        max = 53,
-                        value = c(1, 53)),
-            checkboxGroupInput(inputId = "family", 
-                        label = "Include by Family Type:", 
-                        choices = c("Family", "No Children")),
-            checkboxGroupInput(inputId = "domestic", 
-                        label = "Include by Traveler Origin:", 
-                        choices = c("Domestic", "International")),
-            checkboxGroupInput(inputId = "corporate", 
-                        label = "Include by Corporate Type:", 
-                        choices = c("Business", "Leisure")),
-            actionButton("clear_button", "Clear All Selections")
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-          tabsetPanel(
-            tabPanel(title = "Rates",plotlyOutput(outputId ="ratePlot")),
-            tabPanel(title = "Lead Times",plotlyOutput(outputId ="leadPlot")),
-            tabPanel(title = "Guests",plotlyOutput(outputId ="ratioPlot"))
+# Define UI for application
+ui <- navbarPage(theme = shinytheme("flatly"),
+        title = "DATA 608",
+        tabPanel(title = "Introduction",
+          h4(strong("Project Description")),
+          "This project utilizes publicly available hotel booking data compiled by researchers from the University Institute of Lisbon. It is available at:", 
+          a(href = "https://www.sciencedirect.com/science/article/pii/S2352340918315191",
+            "Science Direct. "),
+          "The researchers sanitized actual data from two hotels SQL databases, sanitized customer and hotel identities and released it under a creative common license. This data set is particularly useful for visualizations as well as possible modeling scenarios.",
+          br(),
+          br(), 
+          "In this project I aim to create useful visualizations representing changes over time of key variables for the hotel in Lisbon. This could be useful for both a business reporting scenario – local hotel management trying to address monthly or weekly trends. As well as possible traveler research scenarios.",
+          br(),
+          br(), 
+          "My visualizations show trends in the hotel pricing, booking lead times and guest demographic trends. Reactive filters for all visualizations allow the data to be filtered by traveler place of origin, family travel status and business travel status. 
+          The code for this application is available on"),
+          a(href = "https://github.com/adavidowitz100/DATA608Visualization/tree/main/FinalProject/LisbonHotels",
+          "Github."),
+        tabPanel(title = "Visualizations", 
+          fluidPage(
+          
+          # Application title
+          titlePanel("Traveler Hotel Data in Lisbon Portugal"),
+      
+          # Sidebar with a slider input
+          sidebarLayout(
+              sidebarPanel(
+                  sliderInput(inputId  = "weeks",
+                              label  = "Week:",
+                              min = 1,
+                              max = 53,
+                              value = c(1, 53)),
+                  checkboxGroupInput(inputId = "family", 
+                              label = "Include by Family Type:", 
+                              choices = c("Family", "No Children")),
+                  checkboxGroupInput(inputId = "domestic", 
+                              label = "Include by Traveler Origin:", 
+                              choices = c("Domestic", "International")),
+                  checkboxGroupInput(inputId = "corporate", 
+                              label = "Include by Corporate Type:", 
+                              choices = c("Business", "Leisure")),
+                  actionButton("clear_button", "Clear All Selections")
+              ),
+      
+              # Show plots
+              mainPanel(
+                tabsetPanel(
+                  br(),
+                  tabPanel(title = "Rates",plotlyOutput(outputId ="ratePlot")),
+                  tabPanel(title = "Lead Times",plotlyOutput(outputId ="leadPlot")),
+                  tabPanel(title = "Guests",plotlyOutput(outputId ="ratioPlot"))
+                )
+              )
           )
-        )
-    )
+      )
 )
-
-# Define server logic required to draw a histogram
+)
+# Define server logic required for plots
 server <- function(input, output, session) {
   
   observeEvent(input$clear_button, {
